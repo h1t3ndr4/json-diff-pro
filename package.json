@@ -12,11 +12,8 @@
     "vscode": "^1.85.0"
   },
   "categories": [
-    "JSON",
-    "Diff",
-    "Compare",
-    "Formatter",
-    "Beautifier"
+    "Programming Languages",
+    "Formatters"
   ],
   "activationEvents": [
     "onCommand:json-diff-pro.compare"
