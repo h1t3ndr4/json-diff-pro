@@ -15,6 +15,7 @@
     "Programming Languages",
     "Formatters"
   ],
+  "icon": "media/logo.png",
   "activationEvents": [
     "onCommand:json-diff-pro.compare"
   ],
