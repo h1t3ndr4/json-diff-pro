@@ -1,8 +1,7 @@
 /**
  * JSON Formatter and Validator
- * Pure implementation without external dependencies
+ * Enhanced implementation with better error handling and integration
  */
-
 class JsonFormatter {
     /**
      * Format JSON string with proper indentation and validation
@@ -11,12 +10,10 @@ class JsonFormatter {
      */
     static format(jsonString) {
         try {
-            // First clean the string
             const cleaned = this.cleanJsonString(jsonString);
             const parsed = JSON.parse(cleaned);
             return JSON.stringify(parsed, null, 2);
         } catch (error) {
-            // Enhance error message with line and column info
             const errorInfo = this.getDetailedErrorInfo(jsonString, error);
             throw new Error(errorInfo);
         }
@@ -29,17 +26,19 @@ class JsonFormatter {
      */
     static cleanJsonString(jsonString) {
         if (!jsonString) return '';
-        
-        // Remove comments (both single-line and multi-line)
+
         let cleaned = jsonString.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
-        
-        // Replace single quotes with double quotes for properties
+
         cleaned = cleaned.replace(/(\s*?{\s*?|\s*?,\s*?)(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '$1"$3":');
-        
-        // Remove trailing commas
+
         cleaned = cleaned.replace(/,(\s*[}\]])/g, '$1');
 
-        return cleaned.trim();
+        cleaned = cleaned
+            .replace(/\r\n/g, '\n')
+            .replace(/\t/g, '    ')
+            .trim();
+
+        return cleaned;
     }
 
     /**
@@ -60,7 +59,7 @@ class JsonFormatter {
         const errorLines = jsonString.split('\n');
         const startLine = Math.max(0, line - 2);
         const endLine = Math.min(errorLines.length, line + 1);
-        
+
         let context = '\n\nContext:\n';
         for (let i = startLine; i < endLine; i++) {
             context += `${i + 1}: ${errorLines[i]}\n`;
@@ -80,9 +79,9 @@ class JsonFormatter {
     static validateJson(jsonString) {
         try {
             if (!jsonString.trim()) {
-                return { 
-                    isValid: false, 
-                    error: 'JSON string is empty' 
+                return {
+                    isValid: false,
+                    error: 'JSON string is empty'
                 };
             }
 
@@ -90,8 +89,26 @@ class JsonFormatter {
             JSON.parse(cleaned);
             return { isValid: true };
         } catch (error) {
-            return { 
-                isValid: false, 
+            return {
+                isValid: false,
+                error: this.getDetailedErrorInfo(jsonString, error)
+            };
+        }
+    }
+
+    /**
+     * Parse and validate JSON string safely
+     * @param {string} jsonString 
+     * @returns {{ value: any, error?: string }}
+     */
+    static safeParseJson(jsonString) {
+        try {
+            const cleaned = this.cleanJsonString(jsonString);
+            const parsed = JSON.parse(cleaned);
+            return { value: parsed };
+        } catch (error) {
+            return {
+                value: null,
                 error: this.getDetailedErrorInfo(jsonString, error)
             };
         }

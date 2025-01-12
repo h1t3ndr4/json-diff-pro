@@ -18,7 +18,7 @@ function activate(context) {
     context.subscriptions.push(disposable);
 }
 
-function deactivate() {}
+function deactivate() { }
 
 module.exports = {
     activate,
